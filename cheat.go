@@ -1,8 +1,10 @@
-package anvilutils
+package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
+	"log"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum"
@@ -128,4 +130,53 @@ func (c *Cheat) TakeErc721Token(tokenAddress common.Address, tokenId *big.Int, r
 	callData, _ := abi.Pack("transferFrom", tokenOwner, receiver, tokenId)
 	_, err = c.ImpersonateAccountAndSendTransaction(tokenOwner, tokenAddress, nil, callData, 0, nil)
 	return err
+}
+
+func main() {
+	// Define command line flags
+	contractAddr := flag.String("contract", "", "ERC20 contract address (required)")
+	accountAddr := flag.String("account", "", "Account address to write balance for (required)")
+	amount := flag.String("amount", "0", "Amount to write (default: 0)")
+
+	// Parse command line arguments
+	flag.Parse()
+
+	// Validate required flags
+	if *contractAddr == "" || *accountAddr == "" {
+		log.Fatal("Both -contract and -account flags are required")
+	}
+
+	// Validate addresses
+	if !common.IsHexAddress(*contractAddr) || !common.IsHexAddress(*accountAddr) {
+		log.Fatal("Invalid Ethereum address format")
+	}
+
+	// Convert addresses to proper format
+	dummyContract := common.HexToAddress(*contractAddr)
+	dummyAccount := common.HexToAddress(*accountAddr)
+
+	// Parse amount
+	amountInt := new(big.Int)
+	_, success := amountInt.SetString(*amount, 10)
+	if !success {
+		log.Fatalf("Failed to parse amount: %s", *amount)
+	}
+
+	// Replace with your Ethereum node URL (e.g., local Anvil fork URL)
+	forkUrl := "http://localhost:8545"
+
+	// Create new client
+	client := client.NewClient(forkUrl)
+
+	// Initialize the cheat instance
+	cheat := NewCheat(client)
+
+	// Write ERC20 balance
+	err := cheat.WriteErc20Balance(dummyContract, dummyAccount, amountInt)
+	if err != nil {
+		log.Fatalf("Failed to write ERC20 balance: %v", err)
+	}
+
+	log.Printf("Successfully wrote ERC20 balance of %s tokens for account %s on contract %s",
+		amountInt.String(), dummyAccount.Hex(), dummyContract.Hex())
 }
