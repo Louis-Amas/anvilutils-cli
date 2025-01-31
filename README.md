@@ -57,3 +57,10 @@ You can run anvil separately or use forkCmd to run an anvil chain.
     // to sop fork
     forkCmd.Stop()
 ```
+
+## Cli
+
+➜  anvilutils git:(master) go build cheat.go
+➜  anvilutils git:(master) ✗ ./cheat  -contract 0x05BA149A7bd6dC1F937fA9046A9e05C05f3b18b0 -account 0x6a956f0AEd3b8625F20d696A5e934A5DE8C27A2C -amount 2000000000000000000000000
+
+2025/01/31 10:05:13 Successfully wrote ERC20 balance of 2000000000000000000000000 tokens for account 0x6a956f0AEd3b8625F20d696A5e934A5DE8C27A2C on contract 0x05BA149A7bd6dC1F937fA9046A9e05C05f3b18b0
